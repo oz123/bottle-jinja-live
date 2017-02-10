@@ -124,4 +124,4 @@ if __name__ == "__main__":
         print(filepath)
         yield bottle.static_file(filepath, root='./assets/')
 
-    bottle.run(app, host='127.0.0.1', debug=True, reloader=True, port=8080)
+    bottle.run(app, host='0.0.0.0', debug=True, reloader=True, port=8080)
