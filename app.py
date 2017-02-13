@@ -28,21 +28,18 @@ def generate_csrf_token(length):
     return ''.join([choice(chars) for i in range(length)])
 
 
-def require_csrf(callback, *args, **kwargs):
-    import inspect
-    callback_args = inspect.getargspec(callback)[0]
-
-    def wrapper(*args, **kwargs):
-        if request.is_ajax and request.json:
-            token = request.json.get("csrf_token")
-        else:
-            token = request.params.csrf_token
-        if not token or token != global_vars['csrf_token']:
-            abort(400)
-        body = callback(*callback_args, **kwargs)
-        return body
-
-    return wrapper
+def require_csrf():
+    def decorator(callback):
+        def wrapper(*args, **kwargs):
+                if request.is_ajax and request.json:
+                token = request.json.get("csrf_token")
+            else:
+                token = request.params.csrf_token
+            if not token or token != global_vars['csrf_token']:
+                abort(400)
+            return callback(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 global_vars = {'csrf_token': generate_csrf_token(48)}
@@ -61,7 +58,7 @@ def editor():
 
 
 @app.route("/template/", method=["GET", "POST"])
-@require_csrf
+@require_csrf()
 def template_():
     if request.method == 'POST':
         jinja2_env = Environment()
@@ -83,7 +80,7 @@ def template_():
 
 
 @app.route('/validate-jinja/', method=['GET', 'POST'])
-@require_csrf
+@require_csrf()
 def convert():
 
     jinja2_env = Environment()
