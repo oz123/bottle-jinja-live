@@ -31,7 +31,7 @@ def generate_csrf_token(length):
 def require_csrf():
     def decorator(callback):
         def wrapper(*args, **kwargs):
-                if request.is_ajax and request.json:
+            if request.is_ajax and request.json:
                 token = request.json.get("csrf_token")
             else:
                 token = request.params.csrf_token
