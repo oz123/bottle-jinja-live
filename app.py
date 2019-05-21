@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import json
 import os
 import string
+import yaml
 
 from cgi import escape
 
@@ -95,9 +95,9 @@ def convert():
     # Check JSON for errors
     if values:
         try:
-            values = json.loads(values)
+            values = yaml.load(values, Loader=yaml.SafeLoader)
         except ValueError as e:
-            return "Value error in JSON: {0}".format(e)
+            return "Value error in YAML: {0}".format(e)
 
     # If ve have empty var array or other errors we need to catch it and show
     try:
