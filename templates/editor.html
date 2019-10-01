@@ -17,6 +17,14 @@
 										<input type="button" class="btn btn-success" id="convert" value="Validate" />
                     <input type="button" class="btn btn-danger" id="clear" value="Clear" />
                 </div>
+								<h1>Templates</h1>
+								<div id="template-list">
+									<ul>
+										{% for t in templates%}
+										<li id="template-{{ t }}"><a href="#">{{ t }}</a></li>
+										{% endfor %}
+									</ul>
+								</div>
 								<div id="alert_placeholder">
 									<input type="button" class="btn btn-success" id="save" value="Save" style="margin-top: 15px"/>
 								</div>
