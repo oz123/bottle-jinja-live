@@ -17,7 +17,7 @@ $(document).ready(function(){
         $('#render').html('');
     });
 
-    $('#convert').click(function() {
+    function render_template() {
         var is_checked_showwhitespaces = $('input[name="showwhitespaces"]').is(':checked') ? 1:0;
 	$.ajax({
         url: "/validate-jinja/",
@@ -35,6 +35,18 @@ $(document).ready(function(){
             }
 
         });
+    }
+
+    $('#convert').click(function() {
+        render_template();
+    });
+
+    $('#template').on('change keyup paste', function() {
+        render_template();
+    });
+
+    $('#values').on('change keyup paste', function() {
+        render_template();
     });
 
     $("#save").click(function() {
@@ -55,4 +67,6 @@ $(document).ready(function(){
                 }
                 });
     });
+
+    render_template();
 });
