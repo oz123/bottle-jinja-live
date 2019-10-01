@@ -15,7 +15,7 @@ I could not resist and built it with bottle.py.
 
 ```
 
-Careful this application now listen to all incoming requests on 0.0.0.0.
+Careful this application now listens to all incoming requests on 0.0.0.0.
 
 You can run with Docker using:
 
