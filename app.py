@@ -49,7 +49,7 @@ j2template = partial(template, template_settings={'globals': global_vars})
 
 @app.route("/")
 def editor():
-    path = os.path.join(os.getcwd(), "templates")
+    path = os.path.join(os.getcwd(), "editable-templates")
     templates = os.listdir(path)
     with open(os.path.join(path, "example-template.j2")) as f:
         template_content = f.read()
