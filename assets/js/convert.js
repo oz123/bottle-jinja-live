@@ -37,6 +37,24 @@ $(document).ready(function(){
         });
     }
 
+
+    $("[id^=template-]").click(function(obj) {
+	alert(obj.currentTarget.id);
+	var name = obj.currentTarget.id.substr(9);
+	$.ajax({
+	url: "/load/" + name,
+	success: function(response) {
+	  $('#template').val(response.body)
+	  }
+	})
+    })
+
+    function get_template(name) {
+	$.ajax({
+	url: "/load/" + name
+	})
+    }
+
     $('#convert').click(function() {
         render_template();
     });
@@ -47,6 +65,28 @@ $(document).ready(function(){
 
     $('#values').on('change keyup paste', function() {
         render_template();
+    });
+
+    $("#preview").click(function() {
+    	$.ajax({url: "/template/",
+		type: "POST",
+		data: JSON.stringify({"csrf_token": $('input[name="csrf_token"]').val(),
+		       "templateName": $("#templateName").html().substr(10),
+		       "values": $('#values').val(),
+		       "templateContent": $("#template").val(),
+		       "preview": true}
+		),
+	    	contentType: "application/json",
+		success: function(response) {
+			 window.open(response, '_blank');
+                    },
+		statusCode: {
+		    400: function(response) { showalert("Browser refresh required", "alert-warning")},
+		    412: function(response) {
+                         showalert(response.responseText, "alert-warning")},
+		    500: function(response) { showalert("Server error!", "alert-danger")}
+                }
+                });
     });
 
     $("#save").click(function() {

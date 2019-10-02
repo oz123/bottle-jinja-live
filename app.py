@@ -22,6 +22,34 @@ TEMPLATE_PATH.append(os.path.join(os.path.dirname(__file__), 'templates'))
 app = Bottle()
 
 
+def render_template(request):
+    """render a template with vars"""
+    jinja2_env = Environment()
+
+    # Load the template
+    try:
+        jinja2_tpl = jinja2_env.from_string(request.json.get('template',
+                                                             request.json.get('templateContent')))
+    except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
+        return "Syntax error in jinja2 template: {0}".format(e)
+
+    values = request.json['values']
+    # Check JSON for errors
+    if values:
+        try:
+            values = json.loads(values)
+        except ValueError as e:
+            return "Value error in JSON: {0}".format(e)
+
+    # If ve have empty var array or other errors we need to catch it and show
+    try:
+        rendered_jinja2_tpl = jinja2_tpl.render(values)
+    except (ValueError, TypeError) as e:
+        return "Error in your values input filed: {0}".format(e)
+
+    return rendered_jinja2_tpl
+
+
 def generate_csrf_token(length):
     '''Generate a random string using range [a-zA-Z0-9].'''
     chars = string.ascii_letters + string.digits
@@ -55,56 +83,66 @@ def editor():
         template_content = f.read()
 
     return j2template('editor.html',
-                      template_content=template_content, templates=templates)
+                      template_content=template_content,
+                      templates=templates,
+                      name="example-template.j2")
 
 
-@app.route("/template/", method=["GET", "POST"])
+@app.get("/load/<name:path>")
+def load_template(name):
+    path = os.path.join(os.getcwd(), "editable-templates")
+    with open(os.path.join(path, name)) as fh:
+        content = fh.read()
+    return HTTPResponse({'status': 200, 'body': content})
+
+
+@app.get("/preview/<name:path>")
+def load_tmp_template(name):
+    args = {'status': 200}
+    path = os.path.join(os.getcwd(), "editable-templates")
+    preview_template = os.path.join(path, "preview-%s" % name)
+    try:
+        with open(preview_template, "rb") as fh:
+            args['body'] = fh.read()
+        os.unlink(preview_template)
+    except FileNotFoundError:
+        args = {'body': 'Expired'}
+
+    return HTTPResponse(**args)
+
+
+@app.post("/template/")
 @require_csrf()
 def template_():
-    if request.method == 'POST':
-        jinja2_env = Environment()
-        template_content = request.json['templateContent']
-        ans = {}
-        try:
-            jinja2_env.from_string(template_content)
-        except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
-            ans = {'status': 412,
-                   'body': "Syntax error in jinja2 template: {0}".format(e)}
-        if not ans:
-            path = os.path.join(os.getcwd(), "templates")
-            with open(os.path.join(path, "example-template.j2"), "w") as f:
-                f.write(template_content)
-                ans = {'status': 200,
-                       'body': "Successfully saved !"}
+    jinja2_env = Environment()
+    template_content = request.json['templateContent']
+    path = os.path.join(os.getcwd(), "editable-templates")
+    if request.json.get("preview"):
+        name = request.json["templateName"]
+        with open(os.path.join(path, "preview-%s" % name), "w") as fh:
+            rendered_jinja2_tpl = render_template(request)
+            fh.write(rendered_jinja2_tpl)
+        return HTTPResponse(**{"status": 200, "body": "/preview/%s" % name})
+    ans = {}
+    try:
+        jinja2_env.from_string(template_content)
+    except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
+        ans = {'status': 412,
+               'body': "Syntax error in jinja2 template: {0}".format(e)}
+    if not ans:
+        with open(os.path.join(path, "example-template.j2"), "w") as f:
+            f.write(template_content)
+            ans = {'status': 200,
+                   'body': "Successfully saved !"}
 
-        return HTTPResponse(**ans)
+    return HTTPResponse(**ans)
 
 
 @app.route('/validate-jinja/', method=['GET', 'POST'])
 @require_csrf()
 def convert():
 
-    jinja2_env = Environment()
-
-    # Load the template
-    try:
-        jinja2_tpl = jinja2_env.from_string(request.json['template'])
-    except (exceptions.TemplateSyntaxError, exceptions.TemplateError) as e:
-        return "Syntax error in jinja2 template: {0}".format(e)
-
-    values = request.json['values']
-    # Check JSON for errors
-    if values:
-        try:
-            values = json.loads(values)
-        except ValueError as e:
-            return "Value error in JSON: {0}".format(e)
-
-    # If ve have empty var array or other errors we need to catch it and show
-    try:
-        rendered_jinja2_tpl = jinja2_tpl.render(values)
-    except (ValueError, TypeError) as e:
-        return "Error in your values input filed: {0}".format(e)
+    rendered_jinja2_tpl = render_template(request)
 
     show_white_spaces = request.json['showwhitespaces']
     if int(show_white_spaces):
