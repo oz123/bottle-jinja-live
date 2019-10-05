@@ -3,7 +3,7 @@ import os
 import string
 import yaml
 
-from cgi import escape
+from html import escape
 
 
 from functools import partial
