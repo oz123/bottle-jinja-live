@@ -39,7 +39,6 @@ $(document).ready(function(){
 
 
     $("[id^=template-]").click(function(obj) {
-	alert(obj.currentTarget.id);
 	var name = obj.currentTarget.id.substr(9);
 	$.ajax({
 	url: "/load/" + name,

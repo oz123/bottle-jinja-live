@@ -19,3 +19,56 @@ span.whitespace {
 label {
     font-weight: normal;
 }
+
+
+ul, ol{
+  display:inline-block;
+  padding:0.5em;
+  padding-left:2em;
+  margin:0.5em;
+}
+
+ul.custom-bullet, ol.custom-bullet{
+  list-style:none;
+}
+ul.custom-bullet > li, ol.custom-bullet >li {
+  clear:left;
+}
+
+ol.custom-bullet {
+  counter-reset: liNum;
+}
+ol.custom-bullet > li {
+  counter-increment:liNum 1;
+}
+
+ul.custom-bullet > li:before, ol.custom-bullet > li:before {
+  content:"";
+  height:1em;
+  width:1em;
+  display:block;
+  float:left;
+  margin-left:-1.5em;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:100%:
+}
+ol.custom-bullet > li:before{
+  content:counter(liNum);
+  text-align:center;
+}
+
+ul.file > li:before{
+	background-image: url("file.svg");
+  background-size:90%;
+  background-position:center;
+  transition: background-size 0.3s;
+  -webkit-transition: background-size 0.3s;
+}
+
+ul.file > li:last-of-type:before{
+	background-image: url("new-file.svg");
+  background-size:110%;
+	padding: 10px 0px;
+  -webkit-transition: background-size 0.3s;
+}
