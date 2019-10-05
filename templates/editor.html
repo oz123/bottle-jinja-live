@@ -24,13 +24,38 @@
 										{% for t in templates%}
 										<li class="template-link template" id="template-{{ t }}"><a href="#">{{ t }}</a></li>
 										{% endfor %}
-										<li class="template-link template" id="new-template"><a href="#">New template</a></li>
+										<li class="template-link template" id="new-template" data-toggle="modal" data-target="#myModal"><a href="#">New template</a></li>
 									</ul>
 								</div>
 								<div id="alert_placeholder">
 									<input type="button" class="btn btn-success" id="save" value="Save" style="margin-top: 15px"/>
 								</div>
             </div>
+        </div>
+
+        <!-- new template modal-->
+        <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Enter the template name</h4>
+              </div>
+              <form role="form" method="POST" action="">
+              <div class="modal-body">
+              <div class="form-group">
+                <div>
+                   <input type="text" class="form-control input-lg" name="name" value="">
+                </div>
+              </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+              </form>
+            </div>
+          </div>
         </div>
 
         <div class="row">
