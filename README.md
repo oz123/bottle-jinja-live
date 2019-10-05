@@ -1,6 +1,6 @@
 # bottle-jinja-live
 
-A small validator for jinja2 template, inspired by
+A small live editor for jinja2 templates, inspired by
 
 http://stackoverflow.com/q/20145709/492620. The OP
 posted a repository with a flask application that does that,
